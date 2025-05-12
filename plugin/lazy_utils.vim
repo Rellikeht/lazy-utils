@@ -6,64 +6,16 @@ let g:loaded_lazy_utils = 1
 let s:lazy_group_id = 0
 let s:lazy_helper_id = 0
 
-" this currently runs after moving cursor despite name of the event
-" (tested in vim)
-" TODO B maybe there is way to run this automatically after some time
-function! lazy_utils#LoadOnStartup(func)
-  let l:group_name = "lazy_load_group_"..s:lazy_group_id
-  let l:def =<< trim eval STOP
-  function s:LazyHelper_{s:lazy_helper_id}()
-    augroup {l:group_name}
-    autocmd!
-    call {a:func}()
-    augroup END
-  endfunction
-  augroup {l:group_name}
-  autocmd! CursorHold * call s:LazyHelper_{s:lazy_helper_id}()
-  augroup END
-  STOP
-  exe join(l:def, "\n")
+function! s:GetGroupName()
   let s:lazy_group_id = s:lazy_group_id + 1
-  let s:lazy_helper_id = s:lazy_helper_id + 1
+  return "lazy_utils_group_"..s:lazy_group_id
 endfunction
 
-function! lazy_utils#LoadOnInsert(func)
-  let l:group_name = "lazy_load_group_"..s:lazy_group_id
-  let l:def =<< trim eval STOP
-  function s:LazyHelper_{s:lazy_helper_id}()
-    augroup {l:group_name}
-    autocmd!
-    call {a:func}()
-    augroup END
-  endfunction
-  augroup {l:group_name}
-  autocmd! InsertEnter * call s:LazyHelper_{s:lazy_helper_id}()
-  augroup END
-  STOP
-  exe join(l:def, "\n")
-  let s:lazy_group_id = s:lazy_group_id + 1
+function! s:GetHelperName()
   let s:lazy_helper_id = s:lazy_helper_id + 1
+  return "<SID>LazyHelper_"..s:lazy_helper_id
 endfunction
 
-function! lazy_utils#LoadOnFiletypes(filetypes, func)
-  let l:group_name = "lazy_load_group_"..s:lazy_group_id
-  let l:def =<< trim eval STOP
-  function s:LazyHelper_{s:lazy_helper_id}()
-    augroup {l:group_name}
-    autocmd!
-    call {a:func}()
-    augroup END
-  endfunction
-  augroup {l:group_name}
-  autocmd! FileType {a:filetypes} call s:LazyHelper_{s:lazy_helper_id}()
-  augroup END
-  STOP
-  exe join(l:def, "\n")
-  let s:lazy_group_id = s:lazy_group_id + 1
-  let s:lazy_helper_id = s:lazy_helper_id + 1
-endfunction
-
-" not very polished thing
 function! lazy_utils#ReplaceCodes(keys)
   " Why there isn't builtin solution for this
   let l:keys = substitute(a:keys, "<leader>", g:mapleader, "g")
@@ -75,9 +27,64 @@ function! lazy_utils#ReplaceCodes(keys)
   return l:keys
 endfunction
 
+" this currently runs after moving cursor despite name of the event
+" (tested in vim)
+" TODO B maybe there is way to run this automatically after some time
+function! lazy_utils#LoadOnStartup(func)
+  let l:group_name = s:GetGroupName()
+  let l:helper_name = s:GetHelperName()
+  let l:def =<< trim eval STOP
+  function {l:helper_name}()
+    augroup {l:group_name}
+    autocmd!
+    call {a:func}()
+    augroup END
+  endfunction
+  augroup {l:group_name}
+  autocmd! CursorHold * call {l:helper_name}()
+  augroup END
+  STOP
+  exe join(l:def, "\n")
+endfunction
+
+function! lazy_utils#LoadOnInsert(func)
+  let l:group_name = s:GetGroupName()
+  let l:helper_name = s:GetHelperName()
+  let l:def =<< trim eval STOP
+  function {l:helper_name}()
+    augroup {l:group_name}
+    autocmd!
+    call {a:func}()
+    augroup END
+  endfunction
+  augroup {l:group_name}
+  autocmd! InsertEnter * call {l:helper_name}()
+  augroup END
+  STOP
+  exe join(l:def, "\n")
+endfunction
+
+function! lazy_utils#LoadOnFiletypes(filetypes, func)
+  let l:group_name = s:GetGroupName()
+  let l:helper_name = s:GetHelperName()
+  let l:def =<< trim eval STOP
+  function {l:helper_name}()
+    augroup {l:group_name}
+    autocmd!
+    call {a:func}()
+    augroup END
+  endfunction
+  augroup {l:group_name}
+  autocmd! FileType {a:filetypes} call {l:helper_name}()
+  augroup END
+  STOP
+  exe join(l:def, "\n")
+endfunction
+
 function! lazy_utils#LoadOnKeys(keys, func, esc=0)
   " Just to shorten call at the end
-  let l:call = $":<C-u>call <SID>LazyHelper_{s:lazy_helper_id}()<CR>"
+  let l:helper_name = s:GetHelperName()
+  let l:call = $":<C-u>call {l:helper_name}()<CR>"
   let l:def =<< trim eval STOP
   function s:LazyHelper_{s:lazy_helper_id}()
     call {a:func}()
@@ -87,5 +94,4 @@ function! lazy_utils#LoadOnKeys(keys, func, esc=0)
   nnoremap <silent> {a:keys}{(a:esc)?"<Esc>":""} {l:call}
   STOP
   exe join(l:def, "\n")
-  let s:lazy_helper_id = s:lazy_helper_id + 1
 endfunction
