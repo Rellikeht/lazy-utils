@@ -9,7 +9,7 @@ let s:lazy_helper_id = 0
 " this currently runs after moving cursor despite name of the event
 " (tested in vim)
 " TODO B maybe there is way to run this automatically after some time
-function! LazyLoadOnStartup(func)
+function! lazy_utils#LoadOnStartup(func)
   let l:group_name = "lazy_load_group_"..s:lazy_group_id
   let l:def =<< trim eval STOP
   function s:LazyHelper_{s:lazy_helper_id}()
@@ -27,7 +27,7 @@ function! LazyLoadOnStartup(func)
   let s:lazy_helper_id = s:lazy_helper_id + 1
 endfunction
 
-function! LazyLoadOnInsert(func)
+function! lazy_utils#LoadOnInsert(func)
   let l:group_name = "lazy_load_group_"..s:lazy_group_id
   let l:def =<< trim eval STOP
   function s:LazyHelper_{s:lazy_helper_id}()
@@ -45,7 +45,7 @@ function! LazyLoadOnInsert(func)
   let s:lazy_helper_id = s:lazy_helper_id + 1
 endfunction
 
-function! LazyLoadOnFiletypes(filetypes, func)
+function! lazy_utils#LoadOnFiletypes(filetypes, func)
   let l:group_name = "lazy_load_group_"..s:lazy_group_id
   let l:def =<< trim eval STOP
   function s:LazyHelper_{s:lazy_helper_id}()
@@ -64,7 +64,7 @@ function! LazyLoadOnFiletypes(filetypes, func)
 endfunction
 
 " not very polished thing
-function! ReplaceCodes(keys)
+function! lazy_utils#ReplaceCodes(keys)
   " Why there isn't builtin solution for this
   let l:keys = substitute(a:keys, "<leader>", g:mapleader, "g")
   let l:keys = substitute(l:keys, "<space>", " ", "g")
@@ -75,7 +75,7 @@ function! ReplaceCodes(keys)
   return l:keys
 endfunction
 
-function! LazyLoadOnKeys(keys, func, esc=0)
+function! lazy_utils#LoadOnKeys(keys, func, esc=0)
   " Just to shorten call at the end
   let l:call = $":<C-u>call <SID>LazyHelper_{s:lazy_helper_id}()<CR>"
   let l:def =<< trim eval STOP
