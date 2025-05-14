@@ -90,7 +90,7 @@ function! lazy_utils#LoadOnKeys(keys, func, esc=0)
   function s:LazyHelper_{s:lazy_helper_id}()
     nunmap {l:keys}
     call {a:func}()
-    if {a:esc}
+    if {!(a:esc)}
       call feedkeys(lazy_utils#ReplaceCodes("{l:keys}"), "m")
     endif
   endfunction
