@@ -84,14 +84,17 @@ endfunction
 function! lazy_utils#LoadOnKeys(keys, func, esc=0)
   " Just to shorten call at the end
   let l:helper_name = s:GetHelperName()
+  let l:keys = keys..(a:esc ? "<Esc>" : "")
   let l:call = $":<C-u>call {l:helper_name}()<CR>"
   let l:def =<< trim eval STOP
   function s:LazyHelper_{s:lazy_helper_id}()
+    nunmap {l:keys}
     call {a:func}()
-    nunmap {a:keys}{(a:esc)?"<Esc>":""}
-    call feedkeys(lazy_utils#ReplaceCodes("{a:keys}"), "m")
+    if {a:esc}
+      call feedkeys(lazy_utils#ReplaceCodes("{l:keys}"), "m")
+    endif
   endfunction
-  nnoremap <silent> {a:keys}{(a:esc)?"<Esc>":""} {l:call}
+  nnoremap <silent> {l:keys} {l:call}
   STOP
   exe join(l:def, "\n")
 endfunction

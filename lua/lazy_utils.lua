@@ -1,15 +1,18 @@
-do
-  local lazy_group_id = 0
-  function get_group_id()
-    lazy_group_id = lazy_group_id + 1
-    return lazy_group_id - 1
-  end
-  function get_group_name()
-    return "lazy_load_group" .. get_group_id()
-  end
-  function get_group()
-    return vim.api.nvim_create_augroup(get_group_name(), {})
-  end
+local lazy_group_id = 0
+local function get_group_id()
+  lazy_group_id = lazy_group_id + 1
+  return lazy_group_id - 1
+end
+local function get_group_name()
+  return "lazy_load_group" .. get_group_id()
+end
+local function get_group()
+  return vim.api.nvim_create_augroup(get_group_name(), {})
+end
+
+local function replace_keys(keys)
+  -- easy I guess
+  return vim.api.nvim_replace_termcodes(keys, true, true, true)
 end
 
 local M = {
@@ -55,19 +58,18 @@ local M = {
     )
   end,
 
-  replace_keys = function(keys)
-    -- easy I guess
-    return vim.api
-             .nvim_replace_termcodes(keys, true, true, true)
-  end,
+  replace_keys = replace_keys,
 
-  load_on_keys = function(keys, func)
-    local modes = {"n"}
+  load_on_keys = function(keys, func, modes, esc)
+    if modes == nil then modes = {"n"} end
+    if esc then keys = keys .. "<Esc>" end
     vim.keymap.set(
       modes, keys, function()
         vim.keymap.del(modes, keys)
-        vim.fn.feedkeys(replace_keys(keys), "m")
         func()
+        if not esc then
+          vim.fn.feedkeys(replace_keys(keys), "m")
+        end
       end, {noremap = true, silent = true}
     )
   end,
