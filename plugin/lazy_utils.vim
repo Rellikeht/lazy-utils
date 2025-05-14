@@ -84,7 +84,7 @@ endfunction
 function! lazy_utils#LoadOnKeys(keys, func, esc=0)
   " Just to shorten call at the end
   let l:helper_name = s:GetHelperName()
-  let l:keys = keys..(a:esc ? "<Esc>" : "")
+  let l:keys = a:keys..(a:esc ? "<Esc>" : "")
   let l:call = $":<C-u>call {l:helper_name}()<CR>"
   let l:def =<< trim eval STOP
   function s:LazyHelper_{s:lazy_helper_id}()
