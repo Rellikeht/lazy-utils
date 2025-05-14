@@ -27,6 +27,20 @@ local M = {
     )
   end,
 
+  load_on_insert = function(func)
+    local gid = get_group()
+    vim.api.nvim_create_autocmd(
+      {"InsertEnter"}, {
+        pattern = "*",
+        group = gid,
+        callback = function()
+          vim.api.nvim_del_augroup_by_id(gid)
+          func()
+        end,
+      }
+    )
+  end,
+
   load_on_filetypes = function(filetypes, func)
     local gid = get_group()
     vim.api.nvim_create_autocmd(
@@ -45,6 +59,17 @@ local M = {
     -- easy I guess
     return vim.api
              .nvim_replace_termcodes(keys, true, true, true)
+  end,
+
+  load_on_keys = function(keys, func)
+    local modes = {"n"}
+    vim.keymap.set(
+      modes, keys, function()
+        vim.keymap.del(modes, keys)
+        vim.fn.feedkeys(replace_keys(keys), "m")
+        func()
+      end, {noremap = true, silent = true}
+    )
   end,
 
   --

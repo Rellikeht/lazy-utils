@@ -41,7 +41,7 @@ function! lazy_utils#LoadOnStartup(func)
     augroup END
   endfunction
   augroup {l:group_name}
-  autocmd! CursorHold * call {l:helper_name}()
+  autocmd! CursorHold,CursorMoved * call {l:helper_name}()
   augroup END
   STOP
   exe join(l:def, "\n")
