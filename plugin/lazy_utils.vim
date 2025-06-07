@@ -47,7 +47,7 @@ endfunction
 
 " acceptable for now
 function! lazy_utils#LoadOnStartup(func)
-  call lazy_utils#LoadOnCursor(func)
+  call lazy_utils#LoadOnCursor(a:func)
 endfunction
 
 function! lazy_utils#LoadOnInsert(func)
