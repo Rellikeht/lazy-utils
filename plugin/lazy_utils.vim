@@ -17,20 +17,18 @@ function! s:GetHelperName()
 endfunction
 
 function! lazy_utils#ReplaceCodes(keys)
-  " Why there isn't builtin solution for this
+  " why there isn't builtin solution for this
   let l:keys = substitute(a:keys, "<leader>", g:mapleader, "g")
   let l:keys = substitute(l:keys, "<space>", " ", "g")
   let l:keys = substitute(l:keys, "<cr>", "\<CR>", "g")
+  let l:keys = substitute(l:keys, "<esc>", "\<Esc>", "g")
   for l in "qwertyuiopasdfghjklzxcvbnm_^"
     exe $"let l:keys = substitute(l:keys, '<c-{l}>', '{"\<c-"..l..">"}', 'g')"
   endfor
   return l:keys
 endfunction
 
-" this currently runs after moving cursor despite name of the event
-" (tested in vim)
-" TODO B maybe there is way to run this automatically after some time
-function! lazy_utils#LoadOnStartup(func)
+function! lazy_utils#LoadOnCursor(func)
   let l:group_name = s:GetGroupName()
   let l:helper_name = s:GetHelperName()
   let l:def =<< trim eval STOP
@@ -45,6 +43,11 @@ function! lazy_utils#LoadOnStartup(func)
   augroup END
   STOP
   exe join(l:def, "\n")
+endfunction
+
+" acceptable for now
+function! lazy_utils#LoadOnStartup(func)
+  call lazy_utils#LoadOnCursor(func)
 endfunction
 
 function! lazy_utils#LoadOnInsert(func)
@@ -82,7 +85,7 @@ function! lazy_utils#LoadOnFiletypes(filetypes, func)
 endfunction
 
 function! lazy_utils#LoadOnKeys(keys, func, esc=0)
-  " Just to shorten call at the end
+  " just to shorten call at the end
   let l:helper_name = s:GetHelperName()
   let l:keys = a:keys..(a:esc ? "<Esc>" : "")
   let l:call = $":<C-u>call {l:helper_name}()<CR>"
