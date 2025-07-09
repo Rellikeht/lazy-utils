@@ -45,7 +45,7 @@ function! lazy_utils#LoadOnCursor(func)
   exe join(l:def, "\n")
 endfunction
 
-function! lazy_utils#LoadOnCursor(func)
+function! lazy_utils#LoadOnStartup(func)
   let l:group_name = s:GetGroupName()
   let l:helper_name = s:GetHelperName()
   let l:def =<< trim eval STOP
