@@ -15,29 +15,11 @@ local function replace_keys(keys)
   return vim.api.nvim_replace_termcodes(keys, true, true, true)
 end
 
-local function load_on_cursor(func)
-  local gid = get_group()
-  vim.api.nvim_create_autocmd(
-    { "CursorHold", "CursorMoved" }, {
-      pattern = "*",
-      group = gid,
-      callback = function()
-        vim.api.nvim_del_augroup_by_id(gid)
-        func()
-      end,
-    }
-  )
-end
-
-local M = {
-  load_on_cursor = load_on_cursor,
-  -- good for now
-  load_on_startup = load_on_cursor,
-
-  load_on_insert = function(func)
+local function load_on_factory(aucmds)
+  return function(func)
     local gid = get_group()
     vim.api.nvim_create_autocmd(
-      { "InsertEnter" }, {
+      aucmds, {
         pattern = "*",
         group = gid,
         callback = function()
@@ -46,7 +28,16 @@ local M = {
         end,
       }
     )
-  end,
+  end
+end
+
+local M = {
+  replace_keys = replace_keys,
+  load_on_cursor = load_on_factory({ "CursorMoved", "CursorHold" }),
+  load_on_insert = load_on_factory({ "InsertEnter" }),
+  load_on_startup = load_on_factory({
+    "CursorMoved", "CursorHold", "VimEnter",
+  }),
 
   load_on_filetypes = function(filetypes, func)
     local gid = get_group()
@@ -61,8 +52,6 @@ local M = {
       }
     )
   end,
-
-  replace_keys = replace_keys,
 
   load_on_keys = function(keys, func, modes, esc)
     if modes == nil then modes = { "n" } end
