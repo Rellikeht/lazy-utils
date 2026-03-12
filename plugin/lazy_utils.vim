@@ -1,4 +1,4 @@
-if exists("g:loaded_lazy_utils")
+if exists("g:loaded_lazy_utils") || has("nvim")
   finish
 endif
 
@@ -6,17 +6,17 @@ let g:loaded_lazy_utils = 1
 let s:lazy_group_id = 0
 let s:lazy_helper_id = 0
 
-function! s:GetGroupName()
+function! s:GetGroupName() abort
   let s:lazy_group_id = s:lazy_group_id + 1
   return "lazy_utils_group_"..s:lazy_group_id
 endfunction
 
-function! s:GetHelperName()
+function! s:GetHelperName() abort
   let s:lazy_helper_id = s:lazy_helper_id + 1
   return "<SID>LazyHelper_"..s:lazy_helper_id
 endfunction
 
-function! lazy_utils#ReplaceCodes(keys)
+function! lazy_utils#ReplaceCodes(keys) abort
   " why there isn't builtin solution for this
   let l:keys = substitute(a:keys, "<leader>", g:mapleader, "g")
   let l:keys = substitute(l:keys, "<space>", " ", "g")
@@ -28,7 +28,7 @@ function! lazy_utils#ReplaceCodes(keys)
   return l:keys
 endfunction
 
-function! lazy_utils#LoadOnCursor(func)
+function! lazy_utils#LoadOnCursor(func) abort
   let l:group_name = s:GetGroupName()
   let l:helper_name = s:GetHelperName()
   let l:def =<< trim eval STOP
@@ -45,7 +45,7 @@ function! lazy_utils#LoadOnCursor(func)
   exe join(l:def, "\n")
 endfunction
 
-function! lazy_utils#LoadOnStartup(func)
+function! lazy_utils#LoadOnStartup(func) abort
   let l:group_name = s:GetGroupName()
   let l:helper_name = s:GetHelperName()
   let l:def =<< trim eval STOP
@@ -62,7 +62,7 @@ function! lazy_utils#LoadOnStartup(func)
   exe join(l:def, "\n")
 endfunction
 
-function! lazy_utils#LoadOnInsert(func)
+function! lazy_utils#LoadOnInsert(func) abort
   let l:group_name = s:GetGroupName()
   let l:helper_name = s:GetHelperName()
   let l:def =<< trim eval STOP
@@ -79,7 +79,7 @@ function! lazy_utils#LoadOnInsert(func)
   exe join(l:def, "\n")
 endfunction
 
-function! lazy_utils#LoadOnFiletypes(filetypes, func)
+function! lazy_utils#LoadOnFiletypes(filetypes, func) abort
   let l:group_name = s:GetGroupName()
   let l:helper_name = s:GetHelperName()
   let l:def =<< trim eval STOP
@@ -96,7 +96,7 @@ function! lazy_utils#LoadOnFiletypes(filetypes, func)
   exe join(l:def, "\n")
 endfunction
 
-function! lazy_utils#LoadOnKeys(keys, func, esc=0)
+function! lazy_utils#LoadOnKeys(keys, func, esc=0) abort
   " just to shorten call at the end
   let l:helper_name = s:GetHelperName()
   let l:keys = a:keys..(a:esc ? "<Esc>" : "")
