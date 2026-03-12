@@ -1,4 +1,4 @@
-if exists("g:loaded_lazy_utils") || has("nvim")
+if exists("g:loaded_lazy_utils")
   finish
 endif
 
